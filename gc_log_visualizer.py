@@ -43,20 +43,20 @@ class LogParser:
   def __init__(self, input_file):
     self.timestamp = None
     self.input_file = input_file
-    self.pause_file = open('pause.dat', "w+b")
-    self.young_pause_file = open('young-pause.dat', "w+b")
-    self.mixed_pause_file = open('mixed-pause.dat', "w+b")
-    self.pause_count_file = open('pause_count.dat', "w+b")
-    self.full_gc_file = open('full_gc.dat', "w+b")
-    self.gc_file = open('gc.dat', "w+b")
-    self.young_file = open('young.dat', "w+b")
-    self.root_scan_file = open('rootscan.dat', "w+b")
-    self.cms_mark_file = open('cms_mark.dat', "w+b")
-    self.cms_rescan_file = open('cms_rescan.dat', "w+b")
-    self.mixed_duration_file = open('mixed_duration.dat', "w+b")
-    self.exhaustion_file = open('exhaustion.dat', "w+b")
-    self.humongous_objects_file = open('humongous_objects.dat', "w+b")
-    self.reclaimable_file = open('reclaimable.dat', "w+b")
+    self.pause_file = open('pause.dat', "w")
+    self.young_pause_file = open('young-pause.dat', "w")
+    self.mixed_pause_file = open('mixed-pause.dat', "w")
+    self.pause_count_file = open('pause_count.dat', "w")
+    self.full_gc_file = open('full_gc.dat', "w")
+    self.gc_file = open('gc.dat', "w")
+    self.young_file = open('young.dat', "w")
+    self.root_scan_file = open('rootscan.dat', "w")
+    self.cms_mark_file = open('cms_mark.dat', "w")
+    self.cms_rescan_file = open('cms_rescan.dat', "w")
+    self.mixed_duration_file = open('mixed_duration.dat', "w")
+    self.exhaustion_file = open('exhaustion.dat', "w")
+    self.humongous_objects_file = open('humongous_objects.dat', "w")
+    self.reclaimable_file = open('reclaimable.dat', "w")
     self.gc_alg_g1gc = False
     self.gc_alg_cms = False
     self.gc_alg_parallel = False
@@ -314,9 +314,9 @@ class LogParser:
   def get_long_field(self, line, field, def_value=0):
     m = re.match(".*%s=([0-9]+).*" % field, line, flags=0)
     if m:
-      return long(m.group(1))
+      return int(m.group(1))
     else:
-      return long(def_value)
+      return int(def_value)
   
   def parse_log(self):
     with open(self.input_file) as f:
@@ -393,7 +393,7 @@ class LogParser:
     if t and len(t) > 15:  # 15 is mildly arbitrary
       try:
         self.timestamp = dateutil.parser.parse(t)
-      except (ValueError, AttributeError), e:
+      except (ValueError, AttributeError) as e:
         return
     return
 
@@ -467,7 +467,7 @@ class LogParser:
   def collect_reclaimable(self, line):
     m = re.match(LogParser.reclaimablePattern, line, flags=0)
     if m and int(float(m.group(2))) >= int(m.group(3)) and self.timestamp:
-      self.reclaimable_file.write("%s %d\n" % (self.timestamp_string(), long(m.group(1)) / 1048576))
+      self.reclaimable_file.write("%s %d\n" % (self.timestamp_string(), int(m.group(1)) / 1048576))
 
   def collect_stw_sub_timings(self, line):
     if re.match('^[ ]+\[.*', line):
